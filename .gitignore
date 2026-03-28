@@ -1,0 +1,16 @@
+cat > .gitignore << 'EOF'
+# Dependencias en cualquier subcarpeta
+node_modules/
+
+# Variables de entorno
+.env
+.env.local
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+*.code-workspace
+EOF
