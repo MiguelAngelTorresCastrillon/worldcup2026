@@ -5,9 +5,11 @@
   "directories": {
     "test": "tests"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+"scripts": {
+  "start": "node src/app.js",
+  "dev": "nodemon src/app.js",
+  "test": "jest"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
