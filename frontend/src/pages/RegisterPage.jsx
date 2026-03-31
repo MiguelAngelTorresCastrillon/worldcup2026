@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import GoogleButton from '../components/GoogleButton';
 import styles from './AuthPage.module.css';
 
 export default function RegisterPage() {
@@ -10,6 +11,7 @@ export default function RegisterPage() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { register } = useAuth();
   const navigate     = useNavigate();
 
@@ -25,6 +27,27 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = async (googleToken) => {
+    setError('');
+    setGoogleLoading(true);
+    try {
+      const { googleLogin } = await import('../services/auth.service');
+      const res = await googleLogin(googleToken);
+      
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      localStorage.setItem('token', res.data.token);
+      window.location.href = '/dashboard';
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error con Google Sign-In');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleError = (errorMsg) => {
+    setError(errorMsg);
   };
 
   return (
@@ -89,10 +112,23 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button className={styles.btnPrimary} type="submit" disabled={loading}>
+          <button className={styles.btnPrimary} type="submit" disabled={loading || googleLoading}>
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
+
+        <div className={styles.divider}><span>OR SIGN UP WITH</span></div>
+
+        {googleLoading ? (
+          <button className={styles.btnGoogle} disabled>
+            <span>⏳</span> Connecting to Google...
+          </button>
+        ) : (
+          <GoogleButton 
+            onSuccess={handleGoogleSuccess} 
+            onError={handleGoogleError} 
+          />
+        )}
 
         <p className={styles.switch}>
           Already have an account?{' '}

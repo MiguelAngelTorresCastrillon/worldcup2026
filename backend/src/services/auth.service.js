@@ -2,31 +2,45 @@
 const userRepository = require('../repositories/user.repository');
 const { hashPassword, comparePassword } = require('../utils/hash.util');
 const jwtUtil = require('../utils/jwt.util');
+const { verifyGoogleToken } = require('../utils/google.util');
+const emailService = require('../utils/email.util');
 const AppError = require('../errors/AppError');
 
 class AuthService {
 
   async register({ name, email, password }) {
-    const existing = await userRepository.findByEmail(email);
-    if (existing) {
-      throw new AppError('El email ya está registrado', 400);
+    try {
+      const normalizedEmail = email.toLowerCase().trim();
+
+      const existing = await userRepository.findByEmail(normalizedEmail);
+      if (existing) {
+        throw new AppError('El email ya está registrado', 400);
+      }
+
+      const hashedPassword = await hashPassword(password);
+
+      const user = await userRepository.create({
+        name,
+        email: normalizedEmail,
+        password: hashedPassword,
+      });
+
+      const token = jwtUtil.sign({ id: user.id, role: user.role });
+
+      return { user, token };
+
+    } catch (error) {
+      if (error.isUniqueViolation) {
+        throw new AppError('El email ya está registrado', 400);
+      }
+      throw error;
     }
-
-    const hashedPassword = await hashPassword(password);
-
-    const user = await userRepository.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
-    const token = jwtUtil.sign({ id: user.id, role: user.role });
-
-    return { user, token };
   }
 
   async login({ email, password }) {
-    const user = await userRepository.findByEmail(email);
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const user = await userRepository.findByEmail(normalizedEmail);
     if (!user) {
       throw new AppError('Credenciales inválidas', 401);
     }
@@ -40,6 +54,135 @@ class AuthService {
 
     const { password: _, ...userWithoutPassword } = user;
     return { user: userWithoutPassword, token };
+  }
+
+  async googleLogin({ googleToken }) {
+    const googleUser = await verifyGoogleToken(googleToken);
+    
+    if (!googleUser) {
+      throw new AppError('Token de Google inválido', 401);
+    }
+
+    if (!googleUser.emailVerified) {
+      throw new AppError('El email de Google no está verificado', 400);
+    }
+
+    const normalizedEmail = googleUser.email.toLowerCase().trim();
+
+    let user = await userRepository.findByGoogleId(googleUser.googleId);
+    
+    if (!user) {
+      user = await userRepository.findByEmail(normalizedEmail);
+      
+      if (user) {
+        user = await userRepository.linkGoogleAccount(
+          user.id, 
+          googleUser.googleId, 
+          googleUser.picture
+        );
+      } else {
+        user = await userRepository.create({
+          name: googleUser.name,
+          email: normalizedEmail,
+          password: null,
+          role: 'USER',
+          googleId: googleUser.googleId,
+          picture: googleUser.picture,
+        });
+      }
+    }
+
+    const token = jwtUtil.sign({ id: user.id, role: user.role });
+
+    const { password: _, ...userWithoutPassword } = user;
+    return { user: userWithoutPassword, token };
+  }
+
+  async forgotPassword({ email }) {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Buscar usuario (no revelar si existe o no por seguridad)
+    const user = await userRepository.findByEmail(normalizedEmail);
+    
+    if (!user) {
+      // No revelar si el email existe - igual retornar success
+      console.log(`Forgot password requested for non-existent email: ${normalizedEmail}`);
+      return { message: 'Si el email existe, recibirás un enlace de recuperación' };
+    }
+
+    // No permitir reset en cuentas de Google sin password
+    if (user.google_id && !user.password) {
+      throw new AppError('Esta cuenta usa Google Sign-In. Iniciá sesión con Google.', 400);
+    }
+
+    // Generar token de reset (válido 1 hora)
+    const resetToken = emailService.generateResetToken();
+    const expiresDate = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+    // Guardar token en DB
+    await userRepository.setResetToken(normalizedEmail, resetToken, expiresDate);
+
+    // Enviar email
+    const emailSent = await emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
+
+    if (!emailSent) {
+      throw new AppError('Error al enviar el email. Intentá más tarde.', 500);
+    }
+
+    return { message: 'Si el email existe, recibirás un enlace de recuperación' };
+  }
+
+  async resetPassword({ token, newPassword }) {
+    // Validar que el password cumpla requisitos
+    if (!newPassword || newPassword.length < 6) {
+      throw new AppError('La contraseña debe tener mínimo 6 caracteres', 400);
+    }
+
+    // Buscar usuario con token válido
+    const user = await userRepository.findByResetToken(token);
+    
+    if (!user) {
+      throw new AppError('Token inválido o expirado', 400);
+    }
+
+    // Hashear nuevo password
+    const hashedPassword = await hashPassword(newPassword);
+
+    // Actualizar password y limpiar token
+    await userRepository.resetPassword(token, hashedPassword);
+
+    return { message: 'Contraseña actualizada correctamente' };
+  }
+
+  async registerAdmin({ name, email, password }) {
+    try {
+      const normalizedEmail = email.toLowerCase().trim();
+
+      const existing = await userRepository.findByEmail(normalizedEmail);
+      if (existing) {
+        throw new AppError('El email ya está registrado', 400);
+      }
+
+      const hashedPassword = await hashPassword(password);
+
+      const user = await userRepository.create({
+        name,
+        email: normalizedEmail,
+        password: hashedPassword,
+        role: 'ADMIN',
+      });
+
+      const token = jwtUtil.sign({ id: user.id, role: user.role });
+
+      const { password: _, ...userWithoutPassword } = user;
+      return { user: userWithoutPassword, token };
+
+    } catch (error) {
+      if (error.isUniqueViolation) {
+        throw new AppError('El email ya está registrado', 400);
+      }
+      throw error;
+    }
   }
 
 }

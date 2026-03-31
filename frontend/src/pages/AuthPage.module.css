@@ -141,10 +141,43 @@
   font-size: 13px;
 }
 
-.forgot a {
+.forgot a,
+.forgotBtn {
   color: #f0b429;
-  text-decoration: none;
   font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+}
+
+.forgotBtn:hover {
+  text-decoration: underline;
+}
+
+.toast {
+  background: #2d3520;
+  border: 1px solid #4ade80;
+  color: #4ade80;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .btnPrimary {
@@ -237,4 +270,74 @@
   margin-top: 20px;
   font-size: 12px;
   color: #4b5563;
+}
+
+.adminNote {
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+  padding: 12px;
+  background: #0d1117;
+  border-radius: 8px;
+  width: 100%;
+}
+
+/* Modal de Forgot Password */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+  background: #161b22;
+  border: 1px solid #2a2f38;
+  border-radius: 16px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: scaleIn 0.2s ease-out;
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+}
+
+.modalText {
+  font-size: 14px;
+  color: #9ca3af;
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
