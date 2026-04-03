@@ -18,7 +18,7 @@ class UserRepository {
 
   async findById(id) {
     const result = await db.query(
-      'SELECT id, name, email, role, google_id, picture, created_at FROM users WHERE id = $1',
+      'SELECT id, name, email, role, google_id, created_at FROM users WHERE id = $1',
       [id]
     );
     return result.rows[0] || null;
@@ -44,20 +44,20 @@ class UserRepository {
 
   async findAll() {
     const result = await db.query(
-      `SELECT id, name, email, role, google_id, picture, created_at 
+      `SELECT id, name, email, role, google_id, created_at 
        FROM users 
        ORDER BY created_at DESC`
     );
     return result.rows;
   }
 
-  async create({ name, email, password, role = 'USER', googleId = null, picture = null }) {
+  async create({ name, email, password, role = 'USER', googleId = null }) {
     try {
       const result = await db.query(
-        `INSERT INTO users (name, email, password, role, google_id, picture)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING id, name, email, role, google_id, picture, created_at`,
-        [name, email, password, role, googleId, picture]
+        `INSERT INTO users (name, email, password, role, google_id)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, name, email, role, google_id, created_at`,
+        [name, email, password, role, googleId]
       );
       return result.rows[0];
     } catch (error) {
@@ -68,13 +68,13 @@ class UserRepository {
     }
   }
 
-  async linkGoogleAccount(userId, googleId, picture) {
+  async linkGoogleAccount(userId, googleId) {
     const result = await db.query(
       `UPDATE users 
-       SET google_id = $1, picture = COALESCE($2, picture)
-       WHERE id = $3
-       RETURNING id, name, email, role, google_id, picture, created_at`,
-      [googleId, picture, userId]
+       SET google_id = $1
+       WHERE id = $2
+       RETURNING id, name, email, role, google_id, created_at`,
+      [googleId, userId]
     );
     return result.rows[0];
   }

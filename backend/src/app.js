@@ -4,6 +4,7 @@ require('./config/env');
 const { allowedOrigins } = require('./config/env');
 
 const authRoutes = require('./routes/auth.routes');
+const teamRoutes = require('./routes/team.routes');
 const errorMiddleware = require('./middlewares/error.middleware');
 
 const app = express();
@@ -46,6 +47,7 @@ app.use(express.json());
 
 // Rutas
 app.use('/api/auth', authRoutes);
+app.use('/api/teams', teamRoutes);
 
 // Ruta de salud para verificar que el servidor corre
 app.get('/health', (req, res) => {

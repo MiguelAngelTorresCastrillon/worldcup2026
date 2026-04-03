@@ -76,7 +76,7 @@ export default function TeamsPanel() {
   }, [fetchTeams]);
 
   const handleToggleActive = useCallback((id) => () => toggleActive(id), [toggleActive]);
-  const handleEditTeam = useCallback((team) => () => openModal(team), [openModal]);
+  const handleEditTeam = useCallback((team) => () => openModal(team), []);
   const handleDeleteTeam = useCallback((id) => () => deleteTeam(id), [deleteTeam]);
 
   const openModal = useCallback((team = null) => {
@@ -198,20 +198,30 @@ export default function TeamsPanel() {
       {showModal && (
         <div 
           className="fixed inset-0 flex items-center justify-center z-50"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+          style={{ 
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            animation: 'modalBackdrop 0.2s ease-out forwards'
+          }}
           onClick={closeModal}
         >
           <div 
             className="rounded-2xl p-8 w-full max-w-md"
-            style={{ backgroundColor: '#1e293b', border: '1px solid #334155' }}
+            style={{ 
+              backgroundColor: '#1e293b', 
+              border: '1px solid #334155',
+              animation: 'modalSlideIn 0.3s ease-out forwards'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="font-bold text-xl text-white text-center mb-4">
+            <h2 
+              className="font-bold text-xl text-white text-center mb-4"
+              style={{ animation: 'fadeIn 0.3s ease-out 0.1s forwards', opacity: 0 }}
+            >
               {editingTeam ? '✏️ Editar Equipo' : '+ Agregar Equipo'}
             </h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+              <div style={{ animation: 'fadeIn 0.3s ease-out 0.15s forwards', opacity: 0 }}>
                 <label className="block text-sm font-bold text-slate-400 mb-1.5">Nombre del Equipo</label>
                 <input
                   type="text"
@@ -224,7 +234,7 @@ export default function TeamsPanel() {
                 />
               </div>
 
-              <div>
+              <div style={{ animation: 'fadeIn 0.3s ease-out 0.2s forwards', opacity: 0 }}>
                 <label className="block text-sm font-bold text-slate-400 mb-1.5">Grupo</label>
                 <select
                   value={formData.groupLetter}
@@ -240,7 +250,7 @@ export default function TeamsPanel() {
                 </select>
               </div>
 
-              <div>
+              <div style={{ animation: 'fadeIn 0.3s ease-out 0.25s forwards', opacity: 0 }}>
                 <label className="block text-sm font-bold text-slate-400 mb-1.5">URL de la Bandera (opcional)</label>
                 <input
                   type="url"
@@ -255,7 +265,12 @@ export default function TeamsPanel() {
               <button 
                 type="submit" 
                 className="w-full py-3 rounded-xl font-bold"
-                style={{ backgroundColor: '#fbbf24', color: '#0f172a' }}
+                style={{ 
+                  backgroundColor: '#fbbf24', 
+                  color: '#0f172a',
+                  animation: 'fadeIn 0.3s ease-out 0.3s forwards',
+                  opacity: 0
+                }}
               >
                 {editingTeam ? 'Guardar Cambios' : 'Agregar Equipo'}
               </button>
@@ -263,7 +278,11 @@ export default function TeamsPanel() {
               <button 
                 type="button" 
                 onClick={closeModal}
-                className="w-full py-3 rounded-xl font-bold text-slate-400 hover:text-white"
+                className="w-full py-3 rounded-xl font-bold text-slate-400 hover:text-white transition-colors"
+                style={{ 
+                  animation: 'fadeIn 0.3s ease-out 0.35s forwards',
+                  opacity: 0
+                }}
               >
                 Cancelar
               </button>

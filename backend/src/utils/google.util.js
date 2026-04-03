@@ -2,11 +2,7 @@
 // Verificación de tokens de Google OAuth
 const { OAuth2Client } = require('google-auth-library');
 
-const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_CALLBACK_URL
-);
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /**
  * Verifica un token de Google y retorna los datos del usuario

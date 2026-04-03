@@ -77,8 +77,7 @@ class AuthService {
       if (user) {
         user = await userRepository.linkGoogleAccount(
           user.id, 
-          googleUser.googleId, 
-          googleUser.picture
+          googleUser.googleId
         );
       } else {
         user = await userRepository.create({
@@ -87,7 +86,6 @@ class AuthService {
           password: null,
           role: 'USER',
           googleId: googleUser.googleId,
-          picture: googleUser.picture,
         });
       }
     }
