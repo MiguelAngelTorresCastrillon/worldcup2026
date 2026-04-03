@@ -33,37 +33,43 @@ npm install
 
 ### 4. Configurar variables de entorno
 
+Las credenciales de Supabase y email son LAS MISMAS que usa Miguel. Pedíaselas directamente.
+
 #### Backend
 
-En la carpeta `backend/`, creá un archivo `.env` con el siguiente contenido:
+En la carpeta `backend/`, copiá el archivo de ejemplo:
 
-```env
-# Servidor
-PORT=3000
-
-# Supabase (base de datos)
-SUPABASE_URL=tu_supabase_url
-SUPABASE_KEY=tu_supabase_anon_key
-
-# JWT (generá una clave segura, mínimo 32 caracteres)
-JWT_SECRET=tu_clave_jwt_muy_segura_aqui
-
-# Correo electrónico (para forgot password)
-EMAIL_USER=tu_email@gmail.com
-EMAIL_PASS=tu_password_de_aplicación
+```bash
+cp .env.example .env
 ```
 
-**Para obtener las credenciales de Supabase:**
-1. Ir a [supabase.com](https://supabase.com)
-2. Crear un proyecto o usar uno existente
-3. Ir a Settings → API
-4. Copiar "Project URL" y "anon public key"
+Luego editá `.env` y completá los valores que te dé Miguel:
 
-**Para el email (Gmail):**
-1. Activar autenticación de 2 factores en tu cuenta Google
-2. Ir a Google Account → Security → App passwords
-3. Generar una contraseña de aplicación de 16 caracteres
-4. Usar esa contraseña en `EMAIL_PASS`
+```env
+# Puerto del servidor
+PORT=3000
+
+# Supabase - pedile a Miguel las credenciales
+SUPABASE_URL=pedile_a_miguel
+SUPABASE_KEY=pedile_a_miguel
+
+# JWT - pedile a Miguel la clave
+JWT_SECRET=pedile_a_miguel
+
+# Email - pedile a Miguel los datos
+EMAIL_USER=pedile_a_miguel
+EMAIL_PASS=pedile_a_miguel
+```
+
+#### Frontend
+
+En la carpeta `frontend/`:
+
+```bash
+cp .env.example .env
+```
+
+El archivo `.env.example` ya viene configurado para local, pero si usás el backend de Miguel en producción, consultá con él.
 
 #### Frontend
 
@@ -75,12 +81,11 @@ VITE_API_URL=http://localhost:3000/api
 
 ### 5. Configurar la base de datos
 
-El proyecto incluye migraciones SQL. Para ejecutarlas:
+Como la base de datos es la MISMA que la de Miguel, no necesitás ejecutar las migraciones. Pero si querés verificar que esté tudo bien:
 
-1. Ir al dashboard de Supabase
+1. Pedile a Miguel el link del proyecto Supabase
 2. Ir a SQL Editor
-3. Copiar el contenido de `backend/src/migrations/010_init_schema.sql`
-4. Ejecutar el SQL
+3. Verificar que existan las tablas: `users`, `teams`, `matches`, `predictions`
 
 ### 6. Ejecutar el proyecto
 
@@ -198,4 +203,20 @@ npm run build    # Producción
 Si tenés problemas, revisá:
 1. La consola del navegador (F12 → Console)
 2. Los logs del backend en la terminal
-3. La documentación de [Supabase](https://supabase.com/docs)
+3. Consultá con Miguel si las credenciales son correctas
+
+## IMPORTANTE: Credenciales Compartidas
+
+Para que funcione correctamente, necesitás las siguientes credenciales de Miguel:
+
+| Variable | Descripción | Cómo obtenerla |
+|----------|-------------|----------------|
+| `SUPABASE_URL` | URL del proyecto Supabase | Pedir a Miguel |
+| `SUPABASE_KEY` | Clave anon de Supabase | Pedir a Miguel |
+| `JWT_SECRET` | Clave para JWT | Pedir a Miguel |
+| `EMAIL_USER` | Email para enviar correos | Pedir a Miguel |
+| `EMAIL_PASS` | Password de aplicación | Pedir a Miguel |
+
+**Archivos de ejemplo listos para copiar:**
+- `backend/.env.example` → `backend/.env`
+- `frontend/.env.example` → `frontend/.env`
