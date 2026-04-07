@@ -249,4 +249,5 @@ class AuthController {
 
 }
 
+// Patrón Singleton: exportar una única instancia de la clase
 module.exports = new AuthController();

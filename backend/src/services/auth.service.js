@@ -45,6 +45,10 @@ class AuthService {
       throw new AppError('Credenciales inválidas', 401);
     }
 
+    if (user.google_id && !user.password) {
+      throw new AppError('Esta cuenta usa Google Sign-In. Iniciá sesión con Google.', 401);
+    }
+
     const isValid = await comparePassword(password, user.password);
     if (!isValid) {
       throw new AppError('Credenciales inválidas', 401);
@@ -185,4 +189,5 @@ class AuthService {
 
 }
 
+// Patrón Singleton: exportar una única instancia de la clase
 module.exports = new AuthService();

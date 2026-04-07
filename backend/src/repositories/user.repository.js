@@ -112,5 +112,6 @@ class UserRepository {
 
 }
 
+// Patrón Singleton: exportar una única instancia de la clase
 module.exports = new UserRepository();
 module.exports.DB_ERROR_CODES = DB_ERROR_CODES;

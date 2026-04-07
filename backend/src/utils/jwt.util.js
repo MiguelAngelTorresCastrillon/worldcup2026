@@ -5,9 +5,11 @@ const { jwtSecret, jwtExpiresIn } = require('../config/env');
 
 class JwtUtil {
   constructor() {
+    // Patrón Singleton: si ya existe una instancia, retornarla
     if (JwtUtil.instance) {
       return JwtUtil.instance;
     }
+    // Guardar la primera instancia creada
     JwtUtil.instance = this;
   }
 
